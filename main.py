@@ -2,7 +2,7 @@ import PySimpleGUI as sg
 
 n = 1
 layout = [
-    [sg.Text('Cantidad de mazos: '),sg.Input('1'),sg.Button('Guardar'),sg.Text('Mazos en uso: ' + str(n))],
+    [sg.Text('Cantidad de mazos: '),sg.Input('1'),sg.Button('Guardar'),sg.Text('Mazos en uso: ' + str(n),key = 'mazos')],
     [sg.Text('Seleccionar cartas del dealer:')],
     [sg.Button('As',key ='AsDealer'),sg.Button('2',key = '2Dealer'),sg.Button('3',key = '3Dealer'),sg.Button('4',key = '4Dealer'),
     sg.Button('5',key = '5Dealer'),sg.Button('6',key = '6Dealer'),sg.Button('7',key = '7Dealer'),sg.Button('8',key = '8Dealer'),
@@ -12,27 +12,58 @@ layout = [
     [[sg.Button('As',key = 'AsPlayer'),sg.Button('2',key = '2Player'),sg.Button('3',key = '3Player'),sg.Button('4',key = '4Player'),
     sg.Button('5',key = '5Player'),sg.Button('6',key = '6Player'),sg.Button('7',key = '7Player'),sg.Button('8',key = '8Player'),
     sg.Button('9',key = '9Player'),sg.Button('10',key = '10Player'),sg.Button('J',key = 'JPlayer'),sg.Button('Q',key = 'QPlayer'),
-    sg.Button('K',key = 'KPlayer')]]
+    sg.Button('K',key = 'KPlayer')]],
+    [sg.Text('Conteo de cartas: ',key = 'cuenta')]
 ]
 
 window = sg.Window('BlackJack',layout)
 
+baraja = [
+    [4*n,1],
+    [4*n,2],
+    [4*n,3],
+    [4*n,4],
+    [4*n,5],
+    [4*n,6],
+    [4*n,7],
+    [4*n,8],
+    [4*n,9],
+    [4*n,10],
+    [4*n,11],
+    [4*n,12],
+    [4*n,13]]
+
+manoDealer = [
+    [0,1],
+    [0,2],
+    [0,3],
+    [0,4],
+    [0,5],
+    [0,6],
+    [0,7],
+    [0,8],
+    [0,9],
+    [0,10],
+    [0,11],
+    [0,12],
+    [0,13]]
+
+manoPlayer = [
+    [0,1],
+    [0,2],
+    [0,3],
+    [0,4],
+    [0,5],
+    [0,6],
+    [0,7],
+    [0,8],
+    [0,9],
+    [0,10],
+    [0,11],
+    [0,12],
+    [0,13]]
+
 while True:
-    n = 1
-    baraja = [
-        [n,1],
-        [n,2],
-        [n,3],
-        [n,4],
-        [n,5],
-        [n,6],
-        [n,7],
-        [n,8],
-        [n,9],
-        [n,10],
-        [n,11],
-        [n,12],
-        [n,13]]
     event,values = window.read()
 
     if event == sg.WIN_CLOSED:
@@ -41,59 +72,98 @@ while True:
     if event == 'Guardar':
         if(values[0] != n):
             n = values[0]
+            window['mazos'].update('Mazos en uso: ' + str(n))
+    
+    def cartasRestantes():
+        suma = 0
+        for t in baraja:
+            suma += t[0]
+        return suma
+    
+    def cuentaCartas():
+        conteo = 0
+        for t in manoDealer:
+            num = t[1]
+            cantidad = t[0]
+            if num > 1 and num < 7:
+                conteo -= cantidad
+            elif num > 9 or num == 1:
+                conteo += cantidad
+        
+        for t in manoPlayer:
+            num = t[1]
+            cantidad = t[0]
+            if num > 1 and num < 7:
+                conteo -= cantidad
+            elif num > 9 or num == 1:
+                conteo += cantidad
+
+        return conteo
+    
+    def probSacar(num):
+        return baraja[num-1][0]/cartasRestantes()
+    
+    def nuevaCarta(carta,mano):
+        baraja[carta-1][0] -= 1
+        if mano == 1:
+            manoDealer[carta-1][0] += 1
+        elif mano == 2:
+            manoPlayer[carta-1][0] += 1
+        
+        window['cuenta'].update('Conteo de cartas: ' + str(cuentaCartas()))
     
     #ACCIONES DE BOTONES DE SELECCION DE CARTAS
     if event == 'AsDealer':
-        baraja[0][0] -= 1
+        nuevaCarta(1,1)
     if event == 'AsPlayer':
-        baraja[0][0] -= 1
+        nuevaCarta(1,2)
     if event == '2Dealer':
-        baraja[1][0] -= 1
+        nuevaCarta(2,1)
     if event == '2Player':
-        baraja[1][0] -= 1
+        nuevaCarta(2,2)
     if event == '3Dealer':
-        baraja[2][0] -= 1
+        nuevaCarta(3,1)
     if event == '3Player':
-        baraja[2][0] -= 1
+        nuevaCarta(3,2)
     if event == '4Dealer':
-        baraja[3][0] -= 1
+        nuevaCarta(4,1)
     if event == '4Player':
-        baraja[3][0] -= 1
+        nuevaCarta(4,2)
     if event == '5Dealer':
-        baraja[4][0] -= 1
+        nuevaCarta(5,1)
     if event == '5Player':
-        baraja[4][0] -= 1
+        nuevaCarta(5,2)
     if event == '6Dealer':
-        baraja[5][0] -= 1
+        nuevaCarta(6,1)
     if event == '6Player':
-        baraja[5][0] -= 1
+        nuevaCarta(6,2)
     if event == '7Dealer':
-        baraja[6][0] -= 1
+        nuevaCarta(7,1)
     if event == '7Player':
-        baraja[6][0] -= 1
+        nuevaCarta(7,2)
     if event == '8Dealer':
-        baraja[7][0] -= 1
+        nuevaCarta(8,1)
     if event == '8Player':
-        baraja[7][0] -= 1
+        nuevaCarta(8,2)
     if event == '9Dealer':
-        baraja[8][0] -= 1
+        nuevaCarta(9,1)
     if event == '9Player':
-        baraja[8][0] -= 1
+        nuevaCarta(9,2)
     if event == '10Dealer':
-        baraja[9][0] -= 1
+        nuevaCarta(10,1)
     if event == '10Player':
-        baraja[9][0] -= 1
+        nuevaCarta(10,2)
     if event == 'JDealer':
-        baraja[10][0] -= 1
+        nuevaCarta(11,1)
     if event == 'JPlayer':
-        baraja[10][0] -= 1
+        nuevaCarta(11,2)
     if event == 'QDealer':
-        baraja[11][0] -= 1
+        nuevaCarta(12,1)
     if event == 'QPlayer':
-        baraja[11][0] -= 1
+        nuevaCarta(12,2)
     if event == 'KDealer':
-        baraja[12][0] -= 1
+        nuevaCarta(13,1)
     if event == 'KPlayer':
-        baraja[12][0] -= 1
+        nuevaCarta(13,2)
 
 window.close()
