@@ -1,8 +1,10 @@
 import PySimpleGUI as sg
 
 n = 1
+mano2 = False
+cambio = False
 layout = [
-    [sg.Text('Cantidad de mazos: '),sg.Input('1'),sg.Button('Guardar'),sg.Text('Mazos en uso: ' + str(n),key = 'mazos')],
+    [sg.Text('Cantidad de mazos: '),sg.Input('1'),sg.Button('Guardar'),sg.Text('Mazos en uso: 1',key = 'mazos')],
     [sg.Text('Seleccionar cartas del dealer:')],
     [sg.Button('As',key ='AsDealer'),sg.Button('2',key = '2Dealer'),sg.Button('3',key = '3Dealer'),sg.Button('4',key = '4Dealer'),
     sg.Button('5',key = '5Dealer'),sg.Button('6',key = '6Dealer'),sg.Button('7',key = '7Dealer'),sg.Button('8',key = '8Dealer'),
@@ -13,8 +15,8 @@ layout = [
     sg.Button('5',key = '5Player'),sg.Button('6',key = '6Player'),sg.Button('7',key = '7Player'),sg.Button('8',key = '8Player'),
     sg.Button('9',key = '9Player'),sg.Button('10',key = '10Player'),sg.Button('J',key = 'JPlayer'),sg.Button('Q',key = 'QPlayer'),
     sg.Button('K',key = 'KPlayer'),sg.Button('Split',key = 'split')],
-    [sg.Text('Estado Jugador: 0',key = 'pjePlayer'), sg.Text('Estado Dealer: 0',key = 'pjeDealer'),sg.Text('',key = 'pje2Player'),
-    sg.Button('Cambio de ronda',key = 'ronda')],
+    [sg.Text('Estado Jugador: 0',key = 'pjePlayer'),sg.Text('',key = 'pje2Player'),sg.Text('Estado Dealer: 0',key = 'pjeDealer'),
+    sg.Button('Cambio de ronda',key = 'ronda'),sg.Button('Cambio de Mano',key = 'cambioMano')],
     [sg.Text('Conteo de cartas: ',key = 'cuenta')]
 ]
 
@@ -30,10 +32,7 @@ baraja = [
     [4*n,7],
     [4*n,8],
     [4*n,9],
-    [4*n,10],
-    [4*n,11],
-    [4*n,12],
-    [4*n,13]]
+    [16*n,10]]
 
 manoDealer = [
     [0,1],
@@ -143,12 +142,16 @@ def nuevaCarta(carta,mano):
     baraja[carta-1][0] -= 1
     if mano == 1:
         manoDealer[carta-1][0] += 1
+        PuntajeDealer()
     elif mano == 2:
-        manoPlayer[carta-1][0] += 1
+        if mano2:
+            mano2Player[carta-1][0] += 1
+            Puntaje2Player()
+        else:
+            manoPlayer[carta-1][0] += 1
+            PuntajePlayer()
     
     window['cuenta'].update('Conteo de cartas: ' + str(cuentaCartas()))
-    PuntajeDealer()
-    PuntajePlayer()
 
 def cartasRestantes():
     suma = 0
@@ -166,8 +169,12 @@ def splitAs():
     if total == 2:
         manoPlayer[repetido-1][0] -= 1
         mano2Player[repetido-1][0] += 1
+    window['cambioMano'].update('Cambio mano')
     Puntaje2Player()
     PuntajePlayer()
+
+def prob21(mano):
+    return probSacar(21-mano)
 
 while True:
     event,values = window.read()
@@ -186,11 +193,20 @@ while True:
             t[0] = 0
         for t in manoPlayer:
             t[0] = 0
+        
+        mano2 = False
+        cambio = False
         window['pjeDealer'].update('Estado Dealer: 0')
         window['pjePlayer'].update('Estado Jugador: 0')
+        window['pje2Player'].update('')
     
     if event == 'split':
         splitAs()
+        cambio = True
+    
+    if event == 'cambioMano':
+        if cambio:
+            mano2 = True
     
     #ACCIONES DE BOTONES DE SELECCION DE CARTAS
     if event == 'AsDealer':
@@ -234,16 +250,16 @@ while True:
     if event == '10Player':
         nuevaCarta(10,2)
     if event == 'JDealer':
-        nuevaCarta(11,1)
+        nuevaCarta(10,1)
     if event == 'JPlayer':
-        nuevaCarta(11,2)
+        nuevaCarta(10,2)
     if event == 'QDealer':
-        nuevaCarta(12,1)
+        nuevaCarta(10,1)
     if event == 'QPlayer':
-        nuevaCarta(12,2)
+        nuevaCarta(10,2)
     if event == 'KDealer':
-        nuevaCarta(13,1)
+        nuevaCarta(10,1)
     if event == 'KPlayer':
-        nuevaCarta(13,2)
+        nuevaCarta(10,2)
 
 window.close()
