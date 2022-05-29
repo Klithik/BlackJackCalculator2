@@ -9,10 +9,10 @@ layout = [
     sg.Button('9',key = '9Dealer'),sg.Button('10',key = '10Dealer'),sg.Button('J',key = 'JDealer'),sg.Button('Q',key = 'QDealer'),
     sg.Button('K',key = 'KDealer')],
     [sg.Text('Seleccionar cartas del jugador:')],
-    [[sg.Button('As',key = 'AsPlayer'),sg.Button('2',key = '2Player'),sg.Button('3',key = '3Player'),sg.Button('4',key = '4Player'),
+    [sg.Button('As',key = 'AsPlayer'),sg.Button('2',key = '2Player'),sg.Button('3',key = '3Player'),sg.Button('4',key = '4Player'),
     sg.Button('5',key = '5Player'),sg.Button('6',key = '6Player'),sg.Button('7',key = '7Player'),sg.Button('8',key = '8Player'),
     sg.Button('9',key = '9Player'),sg.Button('10',key = '10Player'),sg.Button('J',key = 'JPlayer'),sg.Button('Q',key = 'QPlayer'),
-    sg.Button('K',key = 'KPlayer')]],
+    sg.Button('K',key = 'KPlayer'),sg.Button('Split',key = 'split')],
     [sg.Text('Estado Jugador: 0',key = 'pjePlayer'), sg.Text('Estado Dealer: 0',key = 'pjeDealer'),sg.Button('Cambio de ronda',key = 'ronda')],
     [sg.Text('Conteo de cartas: ',key = 'cuenta')]
 ]
@@ -64,6 +64,21 @@ manoPlayer = [
     [0,12],
     [0,13]]
 
+mano2Player = [
+    [0,1],
+    [0,2],
+    [0,3],
+    [0,4],
+    [0,5],
+    [0,6],
+    [0,7],
+    [0,8],
+    [0,9],
+    [0,10],
+    [0,11],
+    [0,12],
+    [0,13]]
+
 while True:
     event,values = window.read()
 
@@ -82,7 +97,6 @@ while True:
             t[0] = 0
         window['pjeDealer'].update('Estado Dealer: 0')
         window['pjePlayer'].update('Estado Jugador: 0')
-        
     
     def cartasRestantes():
         suma = 0
@@ -90,10 +104,21 @@ while True:
             suma += t[0]
         return suma
     
+    def splitAs():
+        for t in manoPlayer:
+            if t[0] > 1:
+                print('a')
+    
+    if event == 'split':
+        splitAs()
+    
     def PuntajeDealer():
         suma = 0
         for t in manoDealer:
-            suma += t[0]*t[1]
+            if t[1] > 9:
+                suma += t[0]*10
+            else:
+                suma += t[0]*t[1]
         if suma < 12 and manoDealer[0][0] != 0:
             suma += 10
         window['pjeDealer'].update('Estado Dealer: ' + str(suma))
@@ -102,7 +127,10 @@ while True:
     def PuntajePlayer():
         suma = 0
         for t in manoPlayer:
-            suma += t[0]*t[1]
+            if t[1] > 9:
+                suma += t[0]*10
+            else:
+                suma += t[0]*t[1]
         if suma < 12 and manoPlayer[0][0] != 0:
             suma += 10
         window['pjePlayer'].update('Estado Jugador: ' + str(suma))
