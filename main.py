@@ -13,6 +13,7 @@ layout = [
     sg.Button('5',key = '5Player'),sg.Button('6',key = '6Player'),sg.Button('7',key = '7Player'),sg.Button('8',key = '8Player'),
     sg.Button('9',key = '9Player'),sg.Button('10',key = '10Player'),sg.Button('J',key = 'JPlayer'),sg.Button('Q',key = 'QPlayer'),
     sg.Button('K',key = 'KPlayer')]],
+    [sg.Text('Estado Jugador: 0',key = 'pjePlayer'), sg.Text('Estado Dealer: 0',key = 'pjeDealer'),sg.Button('Cambio de ronda',key = 'ronda')],
     [sg.Text('Conteo de cartas: ',key = 'cuenta')]
 ]
 
@@ -74,10 +75,37 @@ while True:
             n = values[0]
             window['mazos'].update('Mazos en uso: ' + str(n))
     
+    if event == 'ronda':
+        for t in manoDealer:
+            t[0] = 0
+        for t in manoPlayer:
+            t[0] = 0
+        window['pjeDealer'].update('Estado Dealer: 0')
+        window['pjePlayer'].update('Estado Jugador: 0')
+        
+    
     def cartasRestantes():
         suma = 0
         for t in baraja:
             suma += t[0]
+        return suma
+    
+    def PuntajeDealer():
+        suma = 0
+        for t in manoDealer:
+            suma += t[0]*t[1]
+        if suma < 12 and manoDealer[0][0] != 0:
+            suma += 10
+        window['pjeDealer'].update('Estado Dealer: ' + str(suma))
+        return suma
+    
+    def PuntajePlayer():
+        suma = 0
+        for t in manoPlayer:
+            suma += t[0]*t[1]
+        if suma < 12 and manoPlayer[0][0] != 0:
+            suma += 10
+        window['pjePlayer'].update('Estado Jugador: ' + str(suma))
         return suma
     
     def cuentaCartas():
@@ -111,6 +139,8 @@ while True:
             manoPlayer[carta-1][0] += 1
         
         window['cuenta'].update('Conteo de cartas: ' + str(cuentaCartas()))
+        PuntajeDealer()
+        PuntajePlayer()
     
     #ACCIONES DE BOTONES DE SELECCION DE CARTAS
     if event == 'AsDealer':
