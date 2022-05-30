@@ -17,7 +17,9 @@ layout = [
     sg.Button('K',key = 'KPlayer'),sg.Button('Split',key = 'split')],
     [sg.Text('Estado Jugador: 0',key = 'pjePlayer'),sg.Text('',key = 'pje2Player'),sg.Text('Estado Dealer: 0',key = 'pjeDealer'),
     sg.Button('Cambio de ronda',key = 'ronda'),sg.Button('Cambio de Mano',key = 'cambioMano')],
-    [sg.Text('Conteo de cartas: ',key = 'cuenta')]
+    [sg.Text('Conteo de cartas: ',key = 'cuenta')],
+    [sg.Text('Probabilidad de 21: -',key = 'P21'),sg.Text('Probabilidad de 20: -',key = 'P20'),
+    sg.Text('Probabilidad de 19: -',key = 'P19'),sg.Text('Probabilidad de 18: -',key = 'P18')]
 ]
 
 window = sg.Window('BlackJack',layout)
@@ -151,6 +153,7 @@ def nuevaCarta(carta,mano):
             manoPlayer[carta-1][0] += 1
             PuntajePlayer()
     
+    window['P21'].update(str(round(actualizaProbs(21),2)) + '%')
     window['cuenta'].update('Conteo de cartas: ' + str(cuentaCartas()))
 
 def cartasRestantes():
@@ -176,12 +179,31 @@ def splitAs():
 def prob21(mano):
     return probSacar(21-mano)
 
+def actualizaProbs(num):
+    contenido = [num]
+    posible = True
+    prob = 0
+    while posible:
+        posible = False
+        probCombinacion = 1
+        total = 25
+        for n in contenido:
+            probCombinacion *= baraja[n-1][0]/total
+            total -= 1
+            baraja[n-1][0] -= 1
+            if n != 1:
+                contenido.remove(n)
+                contenido.append(1)
+                contenido.append(n-1)
+                posible = True
+                break
+        prob += probCombinacion
+    return prob
+
 while True:
     event,values = window.read()
-
     if event == sg.WIN_CLOSED:
         break
-
     if event == 'Guardar':
         if(values[0] != n):
             n = values[0]
