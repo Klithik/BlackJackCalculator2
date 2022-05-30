@@ -151,9 +151,9 @@ def nuevaCarta(carta,mano):
             Puntaje2Player()
         else:
             manoPlayer[carta-1][0] += 1
-            PuntajePlayer()
+            pjePlayer = PuntajePlayer()
     
-    window['P21'].update(str(round(actualizaProbs(21),2)) + '%')
+    window['P21'].update('Probabilidad de 21: ' + str(round(actualizaProbs(21 - pjePlayer),2)) + '%')
     window['cuenta'].update('Conteo de cartas: ' + str(cuentaCartas()))
 
 def cartasRestantes():
@@ -186,11 +186,13 @@ def actualizaProbs(num):
     while posible:
         posible = False
         probCombinacion = 1
-        total = 25
+        total = cartasRestantes()
         for n in contenido:
-            probCombinacion *= baraja[n-1][0]/total
-            total -= 1
-            baraja[n-1][0] -= 1
+            if n < 11:
+                cantidadN = baraja[n-1][0]
+                probCombinacion *= cantidadN/total
+                total -= 1
+                cantidadN -= 1
             if n != 1:
                 contenido.remove(n)
                 contenido.append(1)
@@ -198,6 +200,8 @@ def actualizaProbs(num):
                 posible = True
                 break
         prob += probCombinacion
+    if num == 11:
+        prob += baraja[0][0]/cartasRestantes()
     return prob
 
 while True:
